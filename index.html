@@ -68,7 +68,6 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <h1>Qibla</h1>
 <p class="sub">Find the direction to the Kaaba</p>
 <svg class="div" viewBox="0 0 300 20"><path d="M0 10H125M175 10H300" stroke="#d9b66a" stroke-width="1.2" opacity=".7"/><g fill="none" stroke="#d9b66a" stroke-width="1.4"><circle cx="150" cy="10" r="3"/><path d="M150 1l4 5 5-1-1 5 5 4-5 1 1 5-5-1-4 5-4-5-5 1 1-5-5-1 5-4-1-5 5 1z" transform="scale(.9) translate(16 1)"/></g></svg>
-<div class="pill"><small>Qibla is at</small><b id="qd">--°</b><small>from North</small></div>
 
 <div class="cmpw">
 <svg class="cmp" id="cmp" viewBox="-12 -12 364 364" role="img" aria-label="Qibla compass">
@@ -308,7 +307,7 @@ async function place(lat,lng){
   if(!r.ok)return;const d=await r.json(),n=d.city||d.locality||d.principalSubdivision;
   if(n&&pos&&pos[0]===lat&&pos[1]===lng)$('lc').textContent=n}catch(e){}}
 function ok(p){pos=[p.coords.latitude,p.coords.longitude];gAcc=p.coords.accuracy;q=qibla(pos[0],pos[1]);
- $('qd').textContent=Math.round(q)+'°';$('arrow').setAttribute('transform',`rotate(${q} 170 170)`);
+ $('arrow').setAttribute('transform',`rotate(${q} 170 170)`);
  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';M=method(tz);
  $('lc').textContent=(tz.split('/').pop()||'Here').replace(/_/g,' ');
  place(pos[0],pos[1]);
