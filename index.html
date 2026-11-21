@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#070b17">
 <title>Qibla</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:dark;--gold:#d9b66a;--gold2:#f3dca0;--ink:#e9d8ac;--bg:#070b17;--card:rgba(8,12,24,.78);--ah:clamp(60px,10dvh,92px)}
 html{height:100%}
@@ -24,7 +24,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .div{display:block;width:40%;margin:0 auto 6px}
 .pill{align-self:center;display:inline-flex;align-items:baseline;gap:8px;border:1px solid rgba(217,182,106,.6);border-radius:40px;padding:4px 22px;background:var(--card)}
 .pill small{font-size:14px}.pill b{font-size:30px;font-weight:500;line-height:1.1;color:var(--gold2)}
-.cmpw{flex:1 1 auto;min-height:130px;position:relative;margin:6px 0 0}
+.cmpw{flex:1 1 auto;min-height:90px;position:relative;margin:6px 0 0}
 .cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 #fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #ring{will-change:transform}
@@ -48,6 +48,8 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .row div:first-child{border:0}.row small{font-size:14px;color:var(--ink)}.row span{display:block;font-size:16px;white-space:nowrap}
 .row .on{background:rgba(217,182,106,.14)}.row .on small,.row .on span{color:var(--gold2);font-weight:600}
 .meth{font-size:12px;line-height:1.2;color:var(--gold);opacity:.8;margin:6px 0 0}
+.ded{margin:6px 0 0;font:400 17px/1.4 'Amiri','Noto Naskh Arabic','Geeza Pro','Segoe UI',serif;color:var(--gold2)}
+.by{margin:4px 0 0;font-size:12px;line-height:1.2;color:var(--gold);opacity:.6;letter-spacing:.04em}
 .hij{margin:4px 0 0;font-size:15px;line-height:1.2;opacity:.85}
 @media (max-height:780px){.div{display:none}}
 @media (max-height:700px){.sky{display:none}}
@@ -113,6 +115,8 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <p class="meth" id="meth"></p>
 <svg class="div" viewBox="0 0 300 20" aria-hidden="true"><path d="M0 10H125M175 10H300" stroke="#d9b66a" stroke-width="1.2" opacity=".7"/><circle cx="150" cy="10" r="6" fill="none" stroke="#d9b66a" stroke-width="1.4"/><circle cx="150" cy="10" r="2" fill="#d9b66a"/></svg>
 <p class="hij" id="hij"></p>
+<p class="ded" lang="ar" dir="rtl">صدقة جارية عن روح والدي وأمي وأخي</p>
+<p class="by">Designed by: Abdul-Hafiz Sakr</p>
 </main>
 <script>
 const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
