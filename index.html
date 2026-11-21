@@ -26,6 +26,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .pill small{font-size:14px}.pill b{font-size:30px;font-weight:500;line-height:1.1;color:var(--gold2)}
 .cmpw{flex:1 1 auto;min-height:130px;position:relative;margin:6px 0 0}
 .cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #ring{will-change:transform}
 .al #glow{opacity:1}
 #glow{opacity:.55;transition:opacity .3s}
@@ -96,6 +97,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <g id="arrow"><g id="glow"><circle cx="170" cy="10" r="9" fill="#ffe9a8" filter="url(#bl)"/><circle cx="170" cy="10" r="4.5" fill="#fff6d6"/><rect x="167" y="70" width="6" height="90" fill="#f3c96a" filter="url(#bl)" opacity=".7"/></g><rect x="169" y="70" width="2.6" height="92" fill="url(#gd)"/><path d="M170 50L158 78L182 78z" fill="url(#gd)" stroke="#fff3c4" stroke-width=".6"/></g></g>
 <path d="M170 -8L162 -20L178 -20z" transform="translate(0 4)" fill="#f3dca0"/>
 </svg>
+<canvas id="fx" aria-hidden="true"></canvas>
 </div>
 <p id="stat">Tap below to start the compass</p>
 <div class="acts"><button class="btn" id="go">Enable compass &amp; location</button><button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button></div>
@@ -314,13 +316,52 @@ function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textConten
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
 function onOri(e){let h;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading;if(e.webkitCompassAccuracy>=0&&e.webkitCompassAccuracy!=null)cAcc=e.webkitCompassAccuracy}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
  heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
+// ---- facing-Qibla feedback: 1 kHz beep every 200 ms + fireworks over the Kaaba ----
+let ac=null,beepT=null;
+function audioUnlock(){try{if(navigator.audioSession)navigator.audioSession.type='playback';
+ ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
+function beep(){if(!ac||ac.state!=='running')return;
+ const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=1000;
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.35,t+.005);g.gain.setValueAtTime(.35,t+.09);g.gain.linearRampToValueAtTime(0,t+.1);
+ o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.11)}
+let fxOn=false,fxNext=0,fxP=[];const cv=$('fx'),cx=cv.getContext('2d');
+function align(on){
+ clearInterval(beepT);beepT=null;fxOn=on;
+ if(on){beep();beepT=setInterval(beep,200);fxNext=0}}
+let fxR=[];
+function launch(S){ // a spark rises from the Kaaba roof, then bursts
+ const w=cv.width,h=cv.height,x0=w/2+(Math.random()*16-8)*S,y0=h/2+(-22)*S,
+  tx=w/2+(Math.random()*120-60)*S,ty=h/2+(-88+Math.random()*52)*S;
+ fxR.push({x:x0,y:y0,tx,ty,sp:(3.2+Math.random()*.8)*S})}
+function burst(x,y,S){
+ const hue=[44,50,38,198,350,300][Math.floor(Math.random()*6)],n=34+Math.floor(Math.random()*16);
+ for(let i=0;i<n;i++){const a=Math.PI*2*i/n+Math.random()*.25,v=(.7+Math.random()*1.1)*S;
+  fxP.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.011+Math.random()*.009,h:hue+Math.random()*16,s:1.5+Math.random()*1.6})}}
+function fx(now){
+ const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);
+ if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
+ if(!fxOn&&!fxP.length&&!fxR.length){if(cx._dirty){cx.clearRect(0,0,W,H);cx._dirty=false}return}
+ const S=Math.min(W,H)/364; // viewBox is 364 units wide, circle centre at canvas centre
+ if(fxOn&&now>fxNext){launch(S);fxNext=now+420+Math.random()*380}
+ cx.save();cx.beginPath();cx.arc(W/2,H/2,101*S,0,Math.PI*2);cx.clip(); // stay inside the inner circle
+ cx.globalCompositeOperation='destination-out';cx.fillStyle='rgba(0,0,0,.2)';cx.fillRect(0,0,W,H); // fade = glowing trails
+ cx._dirty=true;cx.globalCompositeOperation='lighter';
+ fxR=fxR.filter(p=>{const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);
+  if(d<p.sp){burst(p.tx,p.ty,S);return false}
+  p.x+=dx/d*p.sp;p.y+=dy/d*p.sp;cx.fillStyle='rgba(255,236,170,.95)';cx.beginPath();cx.arc(p.x,p.y,2.2*S,0,Math.PI*2);cx.fill();return true});
+ fxP=fxP.filter(p=>p.life>0);
+ for(const p of fxP){p.x+=p.vx;p.y+=p.vy;p.vy+=.03*S;p.vx*=.985;p.vy*=.985;p.life-=p.d;
+  const l=Math.max(p.life,0);cx.fillStyle=`hsla(${p.h},100%,${58+22*l}%,${Math.min(1,l*1.6)})`;
+  cx.beginPath();cx.arc(p.x,p.y,p.s*S*(.5+.5*l),0,Math.PI*2);cx.fill()}
+ cx.restore();
+ if(!fxOn&&!fxP.length&&!fxR.length)cx.clearRect(0,0,W,H)}
 function loop(){if(heading!=null){shown+=(fix(heading-shown+180,360)-180)*.2;$('ring').setAttribute('transform',`rotate(${-shown} 170 170)`);
  const al=pos&&Math.abs(fix(q-shown+180,360)-180)<3;$('cmp').classList.toggle('al',!!al);
- if(al&&!wasAl&&navigator.vibrate)navigator.vibrate(40);wasAl=al}
- requestAnimationFrame(loop)}
+ if(al&&!wasAl&&navigator.vibrate)navigator.vibrate(40);if(!!al!==wasAl)align(!!al);wasAl=!!al}
+ fx(performance.now());requestAnimationFrame(loop)}
 loop();setInterval(()=>{tick();if(pos){acc();stat()}},1000);
 $('go').onclick=async()=>{
- const b=$('go');b.style.display='none';$('stat').textContent='Starting…';
+ audioUnlock();const b=$('go');b.style.display='none';$('stat').textContent='Starting…';
  try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted')$('stat').textContent='Compass permission denied. Enable motion access for this site in Settings.'}}catch(e){}
  addEventListener('deviceorientationabsolute',onOri,true);addEventListener('deviceorientation',onOri,true);
  if(!navigator.geolocation){$('stat').textContent='Location is not supported on this device';return}
