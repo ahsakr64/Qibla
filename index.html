@@ -8,42 +8,48 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--gold:#d9b66a;--gold2:#f3dca0;--ink:#e9d8ac;--bg:#070b17;--card:rgba(8,12,24,.78);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{color-scheme:dark;--gold:#d9b66a;--gold2:#f3dca0;--ink:#e9d8ac;--bg:#070b17;--card:rgba(8,12,24,.78);--ah:clamp(60px,10dvh,92px)}
+html{height:100%}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:radial-gradient(120% 60% at 50% 0,#0f1b3a 0,#070b17 60%,#05070f 100%) fixed;color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh;overflow-x:hidden}
+body{margin:0;height:100vh;height:100dvh;background:radial-gradient(120% 60% at 50% 0,#0f1b3a 0,#070b17 60%,#05070f 100%) fixed;color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden;overflow-y:auto}
 #stars{position:fixed;inset:0;pointer-events:none}
 #stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:tw 4s infinite alternate}
 @keyframes tw{to{opacity:.1}}
-.app{position:relative;max-width:480px;margin:0 auto;padding:0 16px 24px;text-align:center}
-.arch{display:block;width:calc(100% + 32px);margin:0 -16px;height:auto}
-h1{font-weight:500;font-size:64px;line-height:1;margin:-58px 0 4px;color:var(--gold2);text-shadow:0 0 24px rgba(217,182,106,.35)}
-.sub{font-size:20px;margin:0 0 6px;color:var(--gold)}
-.div{display:block;width:70%;margin:6px auto 14px}
-.pill{display:inline-block;border:1px solid rgba(217,182,106,.6);border-radius:40px;padding:8px 36px;background:var(--card)}
-.pill small{display:block;font-size:15px}.pill b{display:block;font-size:46px;font-weight:500;line-height:1.05;color:var(--gold2)}
-.cmp{width:min(88vw,400px);margin:14px auto 0;display:block;overflow:visible}
+/* one-screen layout: everything is compact, the compass takes the leftover height */
+.app{position:relative;max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) 16px calc(env(safe-area-inset-bottom,0px) + 8px);text-align:center}
+.app>*{flex:none}
+.arch{display:block;width:calc(100% + 32px);margin:0 -16px;height:var(--ah);-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(var(--ah)*-.45) 0 2px;color:var(--gold2);text-shadow:0 0 24px rgba(217,182,106,.35)}
+.sub{font-size:17px;line-height:1.2;margin:0 0 6px;color:var(--gold)}
+.div{display:block;width:40%;margin:0 auto 6px}
+.pill{align-self:center;display:inline-flex;align-items:baseline;gap:8px;border:1px solid rgba(217,182,106,.6);border-radius:40px;padding:4px 22px;background:var(--card)}
+.pill small{font-size:14px}.pill b{font-size:30px;font-weight:500;line-height:1.1;color:var(--gold2)}
+.cmpw{flex:1 1 auto;min-height:130px;position:relative;margin:6px 0 0}
+.cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 #ring{will-change:transform}
 .al #glow{opacity:1}
 #glow{opacity:.55;transition:opacity .3s}
-#stat{min-height:22px;margin:6px 0 0;font-style:italic;font-size:17px;color:var(--gold)}
-.btn{margin:8px auto 0;display:inline-block;border:0;border-radius:30px;padding:12px 28px;font:600 18px 'Cormorant Garamond',Georgia,serif;color:#1a1304;background:linear-gradient(#f3dca0,#c9a45c);box-shadow:0 0 22px rgba(217,182,106,.4)}
-.sky{display:block;width:calc(100% + 32px);margin:-8px -16px 0;height:auto}
-.loc{display:flex;align-items:center;justify-content:space-around;margin:-6px 0 14px;border:1px solid rgba(217,182,106,.55);border-radius:40px;background:var(--card);padding:10px 8px;text-align:left}
-.loc>div{display:flex;gap:12px;align-items:center;flex:1;justify-content:center}.loc>i{width:1px;height:38px;background:rgba(217,182,106,.4)}
-.loc small,.card small{display:block;font-size:15px;color:var(--gold)}.loc b{font-size:22px;font-weight:500;color:var(--ink)}
-.ico{width:34px;height:34px;flex:none}
-.card{border:1px solid rgba(217,182,106,.55);border-radius:26px;background:var(--card);overflow:hidden;text-align:left}
-.top{display:flex;align-items:center;padding:14px 18px 12px}
-.np{flex:1}.np b{display:block;font-size:44px;font-weight:500;line-height:1.05;color:var(--gold2)}.np span{font-size:26px;color:var(--gold)}
-.vl{width:1px;align-self:stretch;background:rgba(217,182,106,.4);margin:0 16px}
-.sr{flex:1;display:flex;gap:12px;align-items:center}.sr span{font-size:26px}
+#stat{min-height:20px;margin:4px 0 0;font-style:italic;font-size:15px;line-height:1.25;color:var(--gold)}
+.acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn{margin:6px 0 0;display:inline-block;border:0;border-radius:30px;padding:9px 24px;font:600 17px 'Cormorant Garamond',Georgia,serif;color:#1a1304;background:linear-gradient(#f3dca0,#c9a45c);box-shadow:0 0 22px rgba(217,182,106,.4)}
+.sky{display:block;width:calc(100% + 32px);margin:6px -16px 0;height:40px}
+.loc{display:flex;align-items:center;justify-content:space-around;margin:6px 0 8px;border:1px solid rgba(217,182,106,.55);border-radius:40px;background:var(--card);padding:6px 8px;text-align:left}
+.loc>div{display:flex;gap:8px;align-items:center;flex:1;justify-content:center}.loc>i{width:1px;height:30px;background:rgba(217,182,106,.4)}
+.loc small,.card small{display:block;font-size:13px;line-height:1.2;color:var(--gold)}.loc b{font-size:18px;font-weight:500;color:var(--ink)}
+.ico{width:26px;height:26px;flex:none}
+.card{border:1px solid rgba(217,182,106,.55);border-radius:22px;background:var(--card);overflow:hidden;text-align:left}
+.top{display:flex;align-items:center;padding:8px 14px}
+.np{flex:1}.np b{display:block;font-size:30px;font-weight:500;line-height:1.05;color:var(--gold2)}.np span{font-size:18px;color:var(--gold)}
+.vl{width:1px;align-self:stretch;background:rgba(217,182,106,.4);margin:0 12px}
+.sr{flex:1;display:flex;gap:8px;align-items:center}.sr span{font-size:20px}
 .row{display:flex;border-top:1px solid rgba(217,182,106,.35);background:rgba(0,0,0,.25)}
-.row div{flex:1;text-align:center;padding:12px 0;font-size:19px;border-left:1px solid rgba(217,182,106,.3)}
-.row div:first-child{border:0}.row small{font-size:17px;color:var(--ink)}.row span{display:block;font-size:19px;white-space:nowrap}
+.row div{flex:1;text-align:center;padding:6px 0;font-size:16px;border-left:1px solid rgba(217,182,106,.3)}
+.row div:first-child{border:0}.row small{font-size:14px;color:var(--ink)}.row span{display:block;font-size:16px;white-space:nowrap}
 .row .on{background:rgba(217,182,106,.14)}.row .on small,.row .on span{color:var(--gold2);font-weight:600}
-.meth{font-size:15px;color:var(--gold);opacity:.8;margin:10px 0 0}
-.hij{margin:6px 0 0;font-size:18px;opacity:.85}
+.meth{font-size:12px;line-height:1.2;color:var(--gold);opacity:.8;margin:6px 0 0}
+.hij{margin:4px 0 0;font-size:15px;line-height:1.2;opacity:.85}
+@media (max-height:780px){.div{display:none}}
+@media (max-height:700px){.sky{display:none}}
 </style>
 </head>
 <body>
@@ -61,6 +67,7 @@ h1{font-weight:500;font-size:64px;line-height:1;margin:-58px 0 4px;color:var(--g
 <svg class="div" viewBox="0 0 300 20"><path d="M0 10H125M175 10H300" stroke="#d9b66a" stroke-width="1.2" opacity=".7"/><g fill="none" stroke="#d9b66a" stroke-width="1.4"><circle cx="150" cy="10" r="3"/><path d="M150 1l4 5 5-1-1 5 5 4-5 1 1 5-5-1-4 5-4-5-5 1 1-5-5-1 5-4-1-5 5 1z" transform="scale(.9) translate(16 1)"/></g></svg>
 <div class="pill"><small>Qibla is at</small><b id="qd">--°</b><small>from North</small></div>
 
+<div class="cmpw">
 <svg class="cmp" id="cmp" viewBox="-12 -12 364 364" role="img" aria-label="Qibla compass">
 <defs>
 <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dca0"/><stop offset=".5" stop-color="#b8903f"/><stop offset="1" stop-color="#f3dca0"/></linearGradient>
@@ -89,10 +96,11 @@ h1{font-weight:500;font-size:64px;line-height:1;margin:-58px 0 4px;color:var(--g
 <g id="arrow"><g id="glow"><circle cx="170" cy="10" r="9" fill="#ffe9a8" filter="url(#bl)"/><circle cx="170" cy="10" r="4.5" fill="#fff6d6"/><rect x="167" y="70" width="6" height="90" fill="#f3c96a" filter="url(#bl)" opacity=".7"/></g><rect x="169" y="70" width="2.6" height="92" fill="url(#gd)"/><path d="M170 50L158 78L182 78z" fill="url(#gd)" stroke="#fff3c4" stroke-width=".6"/></g></g>
 <path d="M170 -8L162 -20L178 -20z" transform="translate(0 4)" fill="#f3dca0"/>
 </svg>
+</div>
 <p id="stat">Tap below to start the compass</p>
-<button class="btn" id="go">Enable compass &amp; location</button> <button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button>
+<div class="acts"><button class="btn" id="go">Enable compass &amp; location</button><button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button></div>
 
-<svg class="sky" id="sky" viewBox="0 0 480 100" aria-hidden="true"></svg>
+<svg class="sky" id="sky" viewBox="0 0 480 100" preserveAspectRatio="none" aria-hidden="true"></svg>
 
 <div class="loc"><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg><span><small>Your Location</small><b id="lc">Locating…</b></span></div><i></i><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg><span><small>Accuracy</small><b id="ac">—</b></span></div></div>
 
