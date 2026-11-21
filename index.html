@@ -166,10 +166,17 @@ function tick(){hij();if(!pos)return;
  L.forEach((d,k)=>{const e=$('p'+k);e.lastChild.textContent=fmt(d);e.className=k===i?'on':''});
  const mins=Math.max(0,Math.floor((tg-now)/6e4)),h=Math.floor(mins/60);
  $('npn').textContent=names[i];$('npt').textContent=mins<1?'in <1m':'in '+(h?h+'h ':'')+mins%60+'m';$('srt').textContent=fmt(sr)}
+// real city name from coordinates (falls back silently to the time-zone name if offline or slow)
+async function place(lat,lng){
+ try{const c=new AbortController(),to=setTimeout(()=>c.abort(),8000);
+  const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,{signal:c.signal});clearTimeout(to);
+  if(!r.ok)return;const d=await r.json(),n=d.city||d.locality||d.principalSubdivision;
+  if(n&&pos&&pos[0]===lat&&pos[1]===lng)$('lc').textContent=n}catch(e){}}
 function ok(p){pos=[p.coords.latitude,p.coords.longitude];gAcc=p.coords.accuracy;q=qibla(pos[0],pos[1]);
  $('qd').textContent=Math.round(q)+'°';$('arrow').setAttribute('transform',`rotate(${q} 170 170)`);
  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';M=method(tz);
  $('lc').textContent=(tz.split('/').pop()||'Here').replace(/_/g,' ');
+ place(pos[0],pos[1]);
  $('meth').textContent=`Prayer times: ${M.n}, selected automatically for your region`;
  acc();tick();stat()}
 function acc(){$('ac').textContent=cAcc>0?'± '+Math.round(cAcc)+'°':gAcc?'± '+Math.round(gAcc)+' m':'—'}
