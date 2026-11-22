@@ -34,9 +34,9 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .cmpw{flex:1 1 auto;min-height:90px;position:relative;margin:6px 0 0}
 .cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 /* Kaaba fades in slowly when facing Qibla, and fades back out when you turn away */
-#kaaba{opacity:.25;transition:opacity .6s ease}
+#kaaba,#klights{opacity:.25;transition:opacity .6s ease}
 #kglow,#klit{opacity:0;transition:opacity .6s ease}
-.al #kaaba,.al #kglow,.al #klit{opacity:1;transition:opacity 1.4s ease}
+.al #kaaba,.al #klights,.al #kglow,.al #klit{opacity:1;transition:opacity 1.4s ease}
 .al #kpulse{animation:kp 1.8s ease-in-out infinite alternate}
 @keyframes kp{from{opacity:.6}to{opacity:1}}
 #ring{will-change:transform}
@@ -96,7 +96,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <rect x="60" y="60" width="220" height="220" fill="url(#sky)"/>
 <rect x="60" y="190" width="220" height="90" fill="url(#fl)"/>
 <g fill="#10131e"><rect x="60" y="164" width="220" height="26"/><path d="M72 164a13 13 0 0 1 26 0zM242 164a13 13 0 0 1 26 0z"/><rect x="82" y="120" width="5" height="44"/><rect x="253" y="120" width="5" height="44"/><path d="M80 120l4.5-12 4.5 12zM251 120l4.5-12 4.5 12z"/></g>
-<rect x="60" y="168" width="220" height="20" fill="url(#win)"/>
+<rect id="klights" x="60" y="168" width="220" height="20" fill="url(#win)"/>
 <ellipse cx="170" cy="206" rx="64" ry="9" fill="#e8b84a" opacity=".5" filter="url(#bl)"/>
 <g id="kpulse"><ellipse id="kglow" cx="170" cy="176" rx="96" ry="84" fill="url(#kg)"/></g>
 <g id="kaaba"><path d="M126 144L170 150L170 206L126 198z" fill="#08080b"/>
