@@ -68,6 +68,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <body>
 <div id="stars"></div>
 <main class="app">
+<label id="hap" aria-hidden="true" style="position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none"><input type="checkbox" switch tabindex="-1"></label>
 <svg class="arch" viewBox="0 0 480 150" aria-hidden="true">
 <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dca0"/><stop offset=".5" stop-color="#c9a45c"/><stop offset="1" stop-color="#8a6a2f"/></linearGradient>
 <mask id="cm"><rect width="480" height="150" fill="#fff"/><circle cx="256" cy="46" r="19" fill="#000"/></mask></defs>
@@ -359,9 +360,13 @@ function align(on){
  if(!au)audioUnlock();
  if(au){au.hold=true;au.muted=false;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(waPlay)}else waPlay()}
 addEventListener('pointerdown',audioUnlock,{passive:true});
+// short double buzz when you lock onto the Qibla. Android: Vibration API. iPhone Safari has no Vibration API,
+// so we try its switch-toggle haptic as a best effort (iOS may refuse it when no finger is touching the screen).
+function buzz(){try{if(navigator.vibrate){navigator.vibrate([90,60,90]);return}}catch(e){}
+ try{const h=$('hap');if(h)h.click()}catch(e){}}
 function loop(){if(heading!=null){shown+=(fix(heading-shown+180,360)-180)*.2;$('ring').setAttribute('transform',`rotate(${-shown} 170 170)`);
  const al=pos&&Math.abs(fix(q-shown+180,360)-180)<3;$('cmp').classList.toggle('al',!!al);
- if(al&&!wasAl&&navigator.vibrate)navigator.vibrate(40);if(!!al!==wasAl)align(!!al);wasAl=!!al}
+ if(al&&!wasAl)buzz();if(!!al!==wasAl)align(!!al);wasAl=!!al}
  requestAnimationFrame(loop)}
 loop();setInterval(()=>{tick();if(pos)stat()},1000);
 $('go').onclick=async()=>{
