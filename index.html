@@ -329,14 +329,14 @@ function ok(p){pos=[p.coords.latitude,p.coords.longitude];q=qibla(pos[0],pos[1])
 function dist(){const p1=pos[0]*R,p2=KAABA[0]*R,dl=(KAABA[1]-pos[1])*R,h=Math.sin((p2-p1)/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
  $('ds').textContent=Math.round(12742*Math.asin(Math.sqrt(h))).toLocaleString('en-US')+' km'}
 function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textContent='Compass not available — Qibla is '+Math.round(q)+'° from North; use a physical compass';return}
- const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
+ const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla'+(spkBlock?' — tap the screen once to enable the voice':''):'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
 function onOri(e){let h;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
  heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
 // ---- facing-Qibla sound: soft Hijaz-inspired chime, then a spoken "Facing Qibla" ----
 // Hijaz colour = the step Eb -> F# (augmented second) resolving to D. Synthesised here (no files).
 // The chime plays through an <audio> element (iPhone allows it even with the silent switch on); WebAudio is only a backup.
 // The voice is the phone's own speech engine, so it follows the phone's voice settings and volume.
-const SR=22050;let sx=null,au=null,ac=null,wa=null,spkT=null;
+const SR=22050;let sx=null,au=null,ac=null,wa=null,spkT=null,spkBlock=false;const spkKeep=[]; // spkKeep: iOS can drop a voice line if nothing holds on to it
 function samples(){if(sx)return sx;
  const x=new Float32Array(Math.round(SR*2.7)),TP=2*Math.PI;
  const bell=(t0,f0,A,tau)=>{const P=[[1,1],[2,.22],[3,.07],[4.2,.03]];
@@ -360,18 +360,23 @@ function audioUnlock(){try{
  if(!au){au=new Audio(wavURL());au.preload='auto';au.setAttribute('playsinline','')}
  if(!au.unl&&au.paused){au.muted=true;const p=au.play();
   if(p&&p.then)p.then(()=>{au.unl=true;if(!au.hold){au.pause();au.currentTime=0}au.muted=false}).catch(()=>{au.muted=false})}
- ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume();
- if('speechSynthesis' in window&&!audioUnlock.sp){audioUnlock.sp=1;const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)} // lets iPhone speak later without a tap
+ // iPhone only lets a page speak after one voice line was started by a tap: do a silent one on the first tap
+ if('speechSynthesis' in window&&!audioUnlock.sp){audioUnlock.sp=1;
+  try{const u=new SpeechSynthesisUtterance('Facing Qibla');u.lang='en-US';u.volume=0;
+   u.onstart=()=>{spkBlock=false};u.onerror=e=>{if(e.error!=='canceled'&&e.error!=='interrupted')audioUnlock.sp=0};
+   spkKeep.push(u);speechSynthesis.speak(u)}catch(e){audioUnlock.sp=0}}
  }catch(e){}}
-function waPlay(){try{if(!ac)return;if(ac.state!=='running')ac.resume();
+function waPlay(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume();
  const x=samples(),b=ac.createBuffer(1,x.length,SR);b.copyToChannel(x,0);
  const n=ac.createBufferSource();n.buffer=b;n.connect(ac.destination);n.start();wa=n}catch(e){}}
-function speak(){try{if(!('speechSynthesis' in window))return;const ss=speechSynthesis;ss.cancel();
- const u=new SpeechSynthesisUtterance('Facing Qibla');u.lang='en-US';u.rate=.9;u.pitch=.95;u.volume=1;
- const vs=ss.getVoices().filter(v=>/^en/i.test(v.lang));const v=vs.find(v=>v.default)||vs.find(v=>/en-US/i.test(v.lang))||vs[0];if(v)u.voice=v;
- ss.speak(u)}catch(e){}}
+function speak(){try{const ss=window.speechSynthesis;if(!ss)return;
+ const go=()=>{const u=new SpeechSynthesisUtterance('Facing Qibla');u.lang='en-US';u.rate=.9;u.pitch=.95;u.volume=1;
+  u.onstart=()=>{spkBlock=false};
+  u.onerror=e=>{if(e.error!=='canceled'&&e.error!=='interrupted'){spkBlock=true;audioUnlock.sp=0}};
+  spkKeep.length=0;spkKeep.push(u);if(ss.paused)ss.resume();ss.speak(u)};
+ if(ss.speaking||ss.pending){ss.cancel();setTimeout(go,80)}else go()}catch(e){}}
 function align(on){
- clearTimeout(spkT);try{speechSynthesis.cancel()}catch(e){}
+ clearTimeout(spkT);try{if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel()}catch(e){}
  if(au){au.hold=false;au.pause();au.currentTime=0}try{wa&&wa.stop()}catch(e){}wa=null;
  if(!on)return;
  if(!au)audioUnlock();
