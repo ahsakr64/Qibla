@@ -59,7 +59,12 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .row div:first-child{border:0}.row small{font-size:14px;color:var(--ink)}.row span{display:block;font-size:16px;white-space:nowrap}
 .row .on{background:rgba(217,182,106,.14)}.row .on small,.row .on span{color:var(--gold2);font-weight:600}
 .meth{font-size:12px;line-height:1.2;color:var(--gold);opacity:.8;margin:6px 0 0}
-.ded{margin:6px 0 0;font:400 17px/1.4 'Amiri','Noto Naskh Arabic','Geeza Pro','Segoe UI',serif;color:var(--gold2)}
+.ar,.ded,.kn{font-family:'Amiri','Noto Naskh Arabic','Geeza Pro','Segoe UI',serif;font-weight:400}
+.ded{margin:6px 0 0;font-size:17px;line-height:1.4;color:var(--gold2)}
+/* name under the Kaaba: sized and placed in units of the compass (cqmin = 1% of its smaller side) */
+.cmpw{container-type:size}
+.kn{position:absolute;left:0;right:0;top:calc(50% + 18.7cqmin);transform:translateY(-50%);text-align:center;font-size:5.8cqmin;line-height:1.3;color:var(--gold2);text-shadow:0 0 .4em rgba(243,196,90,.65);pointer-events:none;opacity:.25;transition:opacity .6s ease}
+#cmp.al~.kn{opacity:1;transition:opacity 1.4s ease}
 .by{margin:4px 0 0;font-size:12px;line-height:1.2;color:var(--gold);opacity:.6;letter-spacing:.04em}
 .hij{margin:4px 0 0;font-size:15px;line-height:1.2;opacity:.85}
 @media (max-height:780px){.div{display:none}}
@@ -112,6 +117,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <g id="arrow"><g id="glow"><circle cx="170" cy="10" r="9" fill="#ffe9a8" filter="url(#bl)"/><circle cx="170" cy="10" r="4.5" fill="#fff6d6"/><rect x="167" y="70" width="6" height="90" fill="#f3c96a" filter="url(#bl)" opacity=".7"/></g><rect x="169" y="70" width="2.6" height="92" fill="url(#gd)"/><path d="M170 50L158 78L182 78z" fill="url(#gd)" stroke="#fff3c4" stroke-width=".6"/></g></g>
 <path d="M170 -8L162 -20L178 -20z" transform="translate(0 4)" fill="#f3dca0"/>
 </svg>
+<div class="kn" lang="ar" dir="rtl" aria-hidden="true">زياد صقر</div>
 </div>
 <p id="stat">Tap below to start the compass</p>
 <div class="acts"><button class="btn" id="go">Enable compass &amp; location</button><button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button></div>
