@@ -332,18 +332,22 @@ function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textConten
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
 function onOri(e){let h;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
  heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
-// ---- facing-Qibla sound: two rising bell notes, played once ----
-// Synthesised here (no files). Played through an <audio> element, which iPhone allows even with the silent switch on;
-// WebAudio is only a backup if the phone refuses the element.
-const SR=22050;let sx=null,au=null,ac=null,wa=null;
+// ---- facing-Qibla sound: soft Hijaz-inspired chime, then a spoken "Facing Qibla" ----
+// Hijaz colour = the step Eb -> F# (augmented second) resolving to D. Synthesised here (no files).
+// The chime plays through an <audio> element (iPhone allows it even with the silent switch on); WebAudio is only a backup.
+// The voice is the phone's own speech engine, so it follows the phone's voice settings and volume.
+const SR=22050;let sx=null,au=null,ac=null,wa=null,spkT=null;
 function samples(){if(sx)return sx;
- const x=new Float32Array(Math.round(SR*2.2)),TP=2*Math.PI;
- const bell=(t0,f0,A,tau)=>{const P=[[1,1],[2.01,.35],[2.76,.18],[4.07,.08]];
-  for(let i=Math.round(t0*SR);i<x.length;i++){const t=i/SR-t0,att=Math.min(1,t/.008);let v=0;for(const[m,g]of P)v+=g*Math.sin(TP*f0*m*t)*Math.exp(-t*m/tau);x[i]+=A*att*v/1.6}};
- bell(0,523.25,.65,.5);bell(.24,783.99,.75,.6);
+ const x=new Float32Array(Math.round(SR*2.7)),TP=2*Math.PI;
+ const bell=(t0,f0,A,tau)=>{const P=[[1,1],[2,.22],[3,.07],[4.2,.03]];
+  for(let i=Math.round(t0*SR);i<x.length;i++){const t=i/SR-t0,att=Math.min(1,t/.012);let v=0;for(const[m,g]of P)v+=g*Math.sin(TP*f0*m*t)*Math.exp(-t*m/tau);x[i]+=A*att*v/1.3}};
+ bell(0,622.25,.7,.55);      // Eb5
+ bell(.30,739.99,.75,.6);    // F#5
+ bell(.64,587.33,.85,1.0);   // D5  (resolution)
+ bell(.64,293.66,.35,1.3);   // D4  (warm low octave underneath)
  let pk=0;for(const v of x)pk=Math.max(pk,Math.abs(v));
  for(let i=0;i<x.length;i++)x[i]*=.7/(pk||1);
- for(let i=0;i<SR*.05;i++)x[x.length-1-i]*=i/(SR*.05); // no click at the end
+ for(let i=0;i<SR*.06;i++)x[x.length-1-i]*=i/(SR*.06); // no click at the end
  return sx=x}
 function wavURL(){const x=samples(),n=x.length,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
  const w=(o,t)=>[...t].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
@@ -356,15 +360,23 @@ function audioUnlock(){try{
  if(!au){au=new Audio(wavURL());au.preload='auto';au.setAttribute('playsinline','')}
  if(!au.unl&&au.paused){au.muted=true;const p=au.play();
   if(p&&p.then)p.then(()=>{au.unl=true;if(!au.hold){au.pause();au.currentTime=0}au.muted=false}).catch(()=>{au.muted=false})}
- ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
+ ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume();
+ if('speechSynthesis' in window&&!audioUnlock.sp){audioUnlock.sp=1;const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)} // lets iPhone speak later without a tap
+ }catch(e){}}
 function waPlay(){try{if(!ac)return;if(ac.state!=='running')ac.resume();
  const x=samples(),b=ac.createBuffer(1,x.length,SR);b.copyToChannel(x,0);
  const n=ac.createBufferSource();n.buffer=b;n.connect(ac.destination);n.start();wa=n}catch(e){}}
+function speak(){try{if(!('speechSynthesis' in window))return;const ss=speechSynthesis;ss.cancel();
+ const u=new SpeechSynthesisUtterance('Facing Qibla');u.lang='en-US';u.rate=.9;u.pitch=.95;u.volume=1;
+ const vs=ss.getVoices().filter(v=>/^en/i.test(v.lang));const v=vs.find(v=>v.default)||vs.find(v=>/en-US/i.test(v.lang))||vs[0];if(v)u.voice=v;
+ ss.speak(u)}catch(e){}}
 function align(on){
+ clearTimeout(spkT);try{speechSynthesis.cancel()}catch(e){}
  if(au){au.hold=false;au.pause();au.currentTime=0}try{wa&&wa.stop()}catch(e){}wa=null;
  if(!on)return;
  if(!au)audioUnlock();
- if(au){au.hold=true;au.muted=false;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(waPlay)}else waPlay()}
+ if(au){au.hold=true;au.muted=false;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(waPlay)}else waPlay();
+ spkT=setTimeout(speak,1500)} // the voice comes in while the chime is still ringing out
 addEventListener('pointerdown',audioUnlock,{passive:true});
 // short double buzz when you lock onto the Qibla. Android: Vibration API. iPhone Safari has no Vibration API,
 // so we try its switch-toggle haptic as a best effort (iOS may refuse it when no finger is touching the screen).
