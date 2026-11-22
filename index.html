@@ -33,7 +33,10 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .pill small{font-size:14px}.pill b{font-size:30px;font-weight:500;line-height:1.1;color:var(--gold2)}
 .cmpw{flex:1 1 auto;min-height:90px;position:relative;margin:6px 0 0}
 .cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#kglow,#klit{opacity:0;transition:opacity .4s ease}
+.al #kglow{opacity:1;animation:kp 1.8s ease-in-out infinite alternate}
+.al #klit{opacity:1}
+@keyframes kp{from{opacity:.6}to{opacity:1}}
 #ring{will-change:transform}
 .al #glow{opacity:1}
 #glow{opacity:.55;transition:opacity .3s}
@@ -82,6 +85,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a48"/><stop offset="1" stop-color="#0b0d16"/></linearGradient>
 <pattern id="win" width="7" height="12" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="3" height="6" rx="1.4" fill="#f3c96a" opacity=".8"/></pattern>
 <clipPath id="cc"><circle cx="170" cy="170" r="101"/></clipPath>
+<radialGradient id="kg" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/><stop offset=".45" stop-color="#f3c45a" stop-opacity=".5"/><stop offset="1" stop-color="#f3c45a" stop-opacity="0"/></radialGradient>
 <filter id="bl"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>
 <circle cx="170" cy="170" r="160" fill="#080c18" stroke="url(#gd)" stroke-width="3"/>
@@ -92,10 +96,12 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <g fill="#10131e"><rect x="60" y="164" width="220" height="26"/><path d="M72 164a13 13 0 0 1 26 0zM242 164a13 13 0 0 1 26 0z"/><rect x="82" y="120" width="5" height="44"/><rect x="253" y="120" width="5" height="44"/><path d="M80 120l4.5-12 4.5 12zM251 120l4.5-12 4.5 12z"/></g>
 <rect x="60" y="168" width="220" height="20" fill="url(#win)"/>
 <ellipse cx="170" cy="206" rx="64" ry="9" fill="#e8b84a" opacity=".5" filter="url(#bl)"/>
+<ellipse id="kglow" cx="170" cy="176" rx="96" ry="84" fill="url(#kg)"/>
 <path d="M126 144L170 150L170 206L126 198z" fill="#08080b"/>
 <path d="M170 150L214 144L214 198L170 206z" fill="#16161c"/>
 <path d="M126 153L170 159L170 166L126 160zM170 159L214 153L214 160L170 166z" fill="url(#gd)"/>
 <rect x="190" y="176" width="9" height="19" fill="#f3c96a" opacity=".85"/>
+<g id="klit"><path d="M126 144L170 150L170 206L126 198z" fill="#ffd978" opacity=".5"/><path d="M170 150L214 144L214 198L170 206z" fill="#ffe9a8" opacity=".62"/><path d="M126 153L170 159L170 166L126 160zM170 159L214 153L214 160L170 166z" fill="#fff6d6" opacity=".9"/><rect x="190" y="176" width="9" height="19" fill="#fffbe8"/></g>
 </g>
 <circle cx="170" cy="170" r="101" fill="none" stroke="#d9b66a" stroke-width="1.2" opacity=".8"/>
 <g id="ring"><g id="ticks" stroke="#d9b66a" stroke-linecap="round"></g>
@@ -103,7 +109,6 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <g id="arrow"><g id="glow"><circle cx="170" cy="10" r="9" fill="#ffe9a8" filter="url(#bl)"/><circle cx="170" cy="10" r="4.5" fill="#fff6d6"/><rect x="167" y="70" width="6" height="90" fill="#f3c96a" filter="url(#bl)" opacity=".7"/></g><rect x="169" y="70" width="2.6" height="92" fill="url(#gd)"/><path d="M170 50L158 78L182 78z" fill="url(#gd)" stroke="#fff3c4" stroke-width=".6"/></g></g>
 <path d="M170 -8L162 -20L178 -20z" transform="translate(0 4)" fill="#f3dca0"/>
 </svg>
-<canvas id="fx" aria-hidden="true"></canvas>
 </div>
 <p id="stat">Tap below to start the compass</p>
 <div class="acts"><button class="btn" id="go">Enable compass &amp; location</button><button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button></div>
@@ -317,49 +322,38 @@ function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textConten
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
 function onOri(e){let h;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading;if(e.webkitCompassAccuracy>=0&&e.webkitCompassAccuracy!=null)cAcc=e.webkitCompassAccuracy}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
  heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
-// ---- facing-Qibla feedback: 1 kHz beep every 200 ms + fireworks over the Kaaba ----
-let ac=null,beepT=null;
-function audioUnlock(){try{if(navigator.audioSession)navigator.audioSession.type='playback';
+// ---- facing-Qibla feedback: 1 kHz beep every 200 ms ----
+// Main path: a looping <audio> clip (10 beeps, 2 s). iPhone plays this even with the silent switch on and keeps it steady.
+// Backup path: WebAudio beeps on a timer, used only if the clip is refused.
+let au=null,ac=null,beepT=null,want=false;
+function wavURL(){const sr=22050,cyc=10,per=sr/5,tone=sr/10,n=per*cyc,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
+ const w=(o,t)=>[...t].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+ w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+ v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+ for(let c=0;c<cyc;c++)for(let i=0;i<tone;i++){const e=Math.min(1,i/66,(tone-i)/66);v.setInt16(44+(c*per+i)*2,Math.sin(2*Math.PI*1000*i/sr)*e*20000,true)}
+ return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+function audioUnlock(){try{
+ if(navigator.audioSession)navigator.audioSession.type='playback';
+ if(!au){au=new Audio(wavURL());au.loop=true;au.preload='auto';au.setAttribute('playsinline','')}
+ if(au.paused){au.muted=!want;const p=au.play();
+  if(p&&p.then)p.then(()=>{if(!want){au.pause();au.currentTime=0}au.muted=false}).catch(()=>{au.muted=false})}
  ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
 function beep(){if(!ac||ac.state!=='running')return;
  const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=1000;
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.35,t+.005);g.gain.setValueAtTime(.35,t+.09);g.gain.linearRampToValueAtTime(0,t+.1);
  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.11)}
-let fxOn=false,fxNext=0,fxP=[];const cv=$('fx'),cx=cv.getContext('2d');
+function waBeep(){if(!want||beepT)return;if(ac&&ac.state!=='running')ac.resume();beep();beepT=setInterval(beep,200)}
 function align(on){
- clearInterval(beepT);beepT=null;fxOn=on;
- if(on){beep();beepT=setInterval(beep,200);fxNext=0}}
-let fxR=[];
-function launch(S){ // a spark rises from the Kaaba roof, then bursts
- const w=cv.width,h=cv.height,x0=w/2+(Math.random()*16-8)*S,y0=h/2+(-22)*S,
-  tx=w/2+(Math.random()*120-60)*S,ty=h/2+(-88+Math.random()*52)*S;
- fxR.push({x:x0,y:y0,tx,ty,sp:(3.2+Math.random()*.8)*S})}
-function burst(x,y,S){
- const hue=[44,50,38,198,350,300][Math.floor(Math.random()*6)],n=34+Math.floor(Math.random()*16);
- for(let i=0;i<n;i++){const a=Math.PI*2*i/n+Math.random()*.25,v=(.7+Math.random()*1.1)*S;
-  fxP.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.011+Math.random()*.009,h:hue+Math.random()*16,s:1.5+Math.random()*1.6})}}
-function fx(now){
- const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2),W=Math.round(r.width*dpr),H=Math.round(r.height*dpr);
- if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}
- if(!fxOn&&!fxP.length&&!fxR.length){if(cx._dirty){cx.clearRect(0,0,W,H);cx._dirty=false}return}
- const S=Math.min(W,H)/364; // viewBox is 364 units wide, circle centre at canvas centre
- if(fxOn&&now>fxNext){launch(S);fxNext=now+420+Math.random()*380}
- cx.save();cx.beginPath();cx.arc(W/2,H/2,101*S,0,Math.PI*2);cx.clip(); // stay inside the inner circle
- cx.globalCompositeOperation='destination-out';cx.fillStyle='rgba(0,0,0,.2)';cx.fillRect(0,0,W,H); // fade = glowing trails
- cx._dirty=true;cx.globalCompositeOperation='lighter';
- fxR=fxR.filter(p=>{const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);
-  if(d<p.sp){burst(p.tx,p.ty,S);return false}
-  p.x+=dx/d*p.sp;p.y+=dy/d*p.sp;cx.fillStyle='rgba(255,236,170,.95)';cx.beginPath();cx.arc(p.x,p.y,2.2*S,0,Math.PI*2);cx.fill();return true});
- fxP=fxP.filter(p=>p.life>0);
- for(const p of fxP){p.x+=p.vx;p.y+=p.vy;p.vy+=.03*S;p.vx*=.985;p.vy*=.985;p.life-=p.d;
-  const l=Math.max(p.life,0);cx.fillStyle=`hsla(${p.h},100%,${58+22*l}%,${Math.min(1,l*1.6)})`;
-  cx.beginPath();cx.arc(p.x,p.y,p.s*S*(.5+.5*l),0,Math.PI*2);cx.fill()}
- cx.restore();
- if(!fxOn&&!fxP.length&&!fxR.length)cx.clearRect(0,0,W,H)}
+ want=on;clearInterval(beepT);beepT=null;
+ if(!au)audioUnlock();
+ if(on){if(au){au.muted=false;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(waBeep)}else waBeep()}
+ else if(au){au.pause();au.currentTime=0}}
+addEventListener('pointerdown',audioUnlock,{passive:true});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want&&au&&au.paused){const p=au.play();if(p&&p.catch)p.catch(waBeep)}});
 function loop(){if(heading!=null){shown+=(fix(heading-shown+180,360)-180)*.2;$('ring').setAttribute('transform',`rotate(${-shown} 170 170)`);
  const al=pos&&Math.abs(fix(q-shown+180,360)-180)<3;$('cmp').classList.toggle('al',!!al);
  if(al&&!wasAl&&navigator.vibrate)navigator.vibrate(40);if(!!al!==wasAl)align(!!al);wasAl=!!al}
- fx(performance.now());requestAnimationFrame(loop)}
+ requestAnimationFrame(loop)}
 loop();setInterval(()=>{tick();if(pos){acc();stat()}},1000);
 $('go').onclick=async()=>{
  audioUnlock();const b=$('go');b.style.display='none';$('stat').textContent='Starting…';
