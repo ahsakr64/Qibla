@@ -33,9 +33,11 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .pill small{font-size:14px}.pill b{font-size:30px;font-weight:500;line-height:1.1;color:var(--gold2)}
 .cmpw{flex:1 1 auto;min-height:90px;position:relative;margin:6px 0 0}
 .cmp{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-#kglow,#klit{opacity:0;transition:opacity .4s ease}
-.al #kglow{opacity:1;animation:kp 1.8s ease-in-out infinite alternate}
-.al #klit{opacity:1}
+/* Kaaba fades in slowly when facing Qibla, and fades back out when you turn away */
+#kaaba{opacity:.25;transition:opacity .6s ease}
+#kglow,#klit{opacity:0;transition:opacity .6s ease}
+.al #kaaba,.al #kglow,.al #klit{opacity:1;transition:opacity 1.4s ease}
+.al #kpulse{animation:kp 1.8s ease-in-out infinite alternate}
 @keyframes kp{from{opacity:.6}to{opacity:1}}
 #ring{will-change:transform}
 .al #glow{opacity:1}
@@ -59,6 +61,13 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .meth{font-size:12px;line-height:1.2;color:var(--gold);opacity:.8;margin:6px 0 0}
 .ded{margin:6px 0 0;font:400 17px/1.4 'Amiri','Noto Naskh Arabic','Geeza Pro','Segoe UI',serif;color:var(--gold2)}
 .by{margin:4px 0 0;font-size:12px;line-height:1.2;color:var(--gold);opacity:.6;letter-spacing:.04em}
+.snd{position:absolute;z-index:20;top:calc(env(safe-area-inset-top,0px) + 10px);right:14px;width:38px;height:38px;padding:0;border-radius:50%;border:1px solid rgba(217,182,106,.55);background:var(--card);color:var(--gold);display:grid;place-items:center}
+.snd svg{width:21px;height:21px}.snd .x{display:none}.snd.off .w{display:none}.snd.off .x{display:inline}
+.sndm{position:absolute;z-index:20;top:calc(env(safe-area-inset-top,0px) + 54px);right:14px;min-width:230px;border:1px solid rgba(217,182,106,.55);border-radius:16px;background:rgba(8,12,24,.97);padding:6px;text-align:left;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+.sndm[hidden]{display:none}
+.sndm small{display:block;padding:6px 10px 4px;font-size:13px;color:var(--gold)}
+.sndm button{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;color:var(--ink);font:500 18px 'Cormorant Garamond',Georgia,serif;padding:9px 10px;border-radius:10px;text-align:left}
+.sndm button.on{background:rgba(217,182,106,.14);color:var(--gold2)}
 .hij{margin:4px 0 0;font-size:15px;line-height:1.2;opacity:.85}
 @media (max-height:780px){.div{display:none}}
 </style>
@@ -66,6 +75,8 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <body>
 <div id="stars"></div>
 <main class="app">
+<button class="snd" id="snd" aria-label="Sound options" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5v5h4l5 4v-13l-5 4z" fill="currentColor" stroke="none"/><g class="w"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18.3 6.3a8 8 0 0 1 0 11.4"/></g><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+<div class="sndm" id="sndm" hidden role="menu"></div>
 <svg class="arch" viewBox="0 0 480 150" aria-hidden="true">
 <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dca0"/><stop offset=".5" stop-color="#c9a45c"/><stop offset="1" stop-color="#8a6a2f"/></linearGradient>
 <mask id="cm"><rect width="480" height="150" fill="#fff"/><circle cx="256" cy="46" r="19" fill="#000"/></mask></defs>
@@ -96,11 +107,11 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <g fill="#10131e"><rect x="60" y="164" width="220" height="26"/><path d="M72 164a13 13 0 0 1 26 0zM242 164a13 13 0 0 1 26 0z"/><rect x="82" y="120" width="5" height="44"/><rect x="253" y="120" width="5" height="44"/><path d="M80 120l4.5-12 4.5 12zM251 120l4.5-12 4.5 12z"/></g>
 <rect x="60" y="168" width="220" height="20" fill="url(#win)"/>
 <ellipse cx="170" cy="206" rx="64" ry="9" fill="#e8b84a" opacity=".5" filter="url(#bl)"/>
-<ellipse id="kglow" cx="170" cy="176" rx="96" ry="84" fill="url(#kg)"/>
-<path d="M126 144L170 150L170 206L126 198z" fill="#08080b"/>
+<g id="kpulse"><ellipse id="kglow" cx="170" cy="176" rx="96" ry="84" fill="url(#kg)"/></g>
+<g id="kaaba"><path d="M126 144L170 150L170 206L126 198z" fill="#08080b"/>
 <path d="M170 150L214 144L214 198L170 206z" fill="#16161c"/>
 <path d="M126 153L170 159L170 166L126 160zM170 159L214 153L214 160L170 166z" fill="url(#gd)"/>
-<rect x="190" y="176" width="9" height="19" fill="#f3c96a" opacity=".85"/>
+<rect x="190" y="176" width="9" height="19" fill="#f3c96a" opacity=".85"/></g>
 <g id="klit"><path d="M126 144L170 150L170 206L126 198z" fill="#ffd978" opacity=".5"/><path d="M170 150L214 144L214 198L170 206z" fill="#ffe9a8" opacity=".62"/><path d="M126 153L170 159L170 166L126 160zM170 159L214 153L214 160L170 166z" fill="#fff6d6" opacity=".9"/><rect x="190" y="176" width="9" height="19" fill="#fffbe8"/></g>
 </g>
 <circle cx="170" cy="170" r="101" fill="none" stroke="#d9b66a" stroke-width="1.2" opacity=".8"/>
@@ -322,34 +333,61 @@ function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textConten
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
 function onOri(e){let h;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading;if(e.webkitCompassAccuracy>=0&&e.webkitCompassAccuracy!=null)cAcc=e.webkitCompassAccuracy}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
  heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
-// ---- facing-Qibla feedback: 1 kHz beep every 200 ms ----
-// Main path: a looping <audio> clip (10 beeps, 2 s). iPhone plays this even with the silent switch on and keeps it steady.
-// Backup path: WebAudio beeps on a timer, used only if the clip is refused.
-let au=null,ac=null,beepT=null,want=false;
-function wavURL(){const sr=22050,cyc=10,per=sr/5,tone=sr/10,n=per*cyc,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
+// ---- facing-Qibla sound: pick one in the speaker menu (top right) ----
+// Each sound is synthesised here (no files). Played through <audio> elements, which iPhone allows even with the silent switch on;
+// WebAudio is only a backup if the phone refuses an element.
+const SR=22050,KINDS=['chime','rise','tick','beep'],REP={tick:1,beep:1},
+ LABEL={chime:'Soft chime',rise:'Rising notes',tick:'Soft tick',beep:'Original beep (1 kHz)',off:'Off'};
+const SC={};
+function samples(k){if(SC[k])return SC[k];
+ const mk=l=>new Float32Array(Math.round(SR*l)),TP=2*Math.PI;
+ const bell=(x,t0,f0,A,tau)=>{const P=[[1,1],[2.01,.35],[2.76,.18],[4.07,.08]];
+  for(let i=Math.round(t0*SR);i<x.length;i++){const t=i/SR-t0,att=Math.min(1,t/.008);let v=0;for(const[m,g]of P)v+=g*Math.sin(TP*f0*m*t)*Math.exp(-t*m/tau);x[i]+=A*att*v/1.6}};
+ let x;
+ if(k==='chime'){x=mk(2.4);bell(x,0,659.25,.8,.7)}
+ else if(k==='rise'){x=mk(2.2);bell(x,0,523.25,.65,.5);bell(x,.24,783.99,.75,.6)}
+ else if(k==='tick'){x=mk(2);for(const t0 of[0,1])for(let i=0;i<SR*.09;i++){const t=i/SR,e=Math.exp(-t/.012)*Math.min(1,t/.002);x[Math.round(t0*SR)+i]+=.7*e*(Math.sin(TP*750*t)+.3*Math.sin(TP*1500*t))}}
+ else{x=mk(2);for(let c=0;c<10;c++)for(let i=0;i<SR*.1;i++){const e=Math.min(1,i/66,(SR*.1-i)/66);x[Math.round(c*SR*.2)+i]=.6*e*Math.sin(TP*1000*i/SR)}}
+ let pk=0;for(const v of x)pk=Math.max(pk,Math.abs(v));const g=(k==='beep'?.6:.7)/(pk||1);
+ for(let i=0;i<x.length;i++)x[i]*=g;
+ if(!REP[k])for(let i=0;i<SR*.05;i++)x[x.length-1-i]*=i/(SR*.05); // no click at the end
+ return SC[k]=x}
+function wavURL(k){const x=samples(k),n=x.length,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
  const w=(o,t)=>[...t].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
- v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
- for(let c=0;c<cyc;c++)for(let i=0;i<tone;i++){const e=Math.min(1,i/66,(tone-i)/66);v.setInt16(44+(c*per+i)*2,Math.sin(2*Math.PI*1000*i/sr)*e*20000,true)}
+ v.setUint32(24,SR,true);v.setUint32(28,SR*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+ for(let i=0;i<n;i++)v.setInt16(44+i*2,Math.max(-1,Math.min(1,x[i]))*32767,true);
  return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+let snd='chime',want=false,ac=null,wa=null,pvT=null;const auds={};
+try{const t=localStorage.getItem('qibla-snd');if(t==='off'||KINDS.includes(t))snd=t}catch(e){}
 function audioUnlock(){try{
  if(navigator.audioSession)navigator.audioSession.type='playback';
- if(!au){au=new Audio(wavURL());au.loop=true;au.preload='auto';au.setAttribute('playsinline','')}
- if(au.paused){au.muted=!want;const p=au.play();
-  if(p&&p.then)p.then(()=>{if(!want){au.pause();au.currentTime=0}au.muted=false}).catch(()=>{au.muted=false})}
+ for(const k of KINDS){let a=auds[k];
+  if(!a){a=auds[k]=new Audio(wavURL(k));a.loop=!!REP[k];a.preload='auto';a.setAttribute('playsinline','')}
+  if(!a.unl&&a.paused){a.muted=true;const p=a.play();
+   if(p&&p.then)p.then(()=>{a.unl=true;if(!a.hold){a.pause();a.currentTime=0}a.muted=false}).catch(()=>{a.muted=false})}}
  ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
-function beep(){if(!ac||ac.state!=='running')return;
- const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=1000;
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.35,t+.005);g.gain.setValueAtTime(.35,t+.09);g.gain.linearRampToValueAtTime(0,t+.1);
- o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.11)}
-function waBeep(){if(!want||beepT)return;if(ac&&ac.state!=='running')ac.resume();beep();beepT=setInterval(beep,200)}
-function align(on){
- want=on;clearInterval(beepT);beepT=null;
- if(!au)audioUnlock();
- if(on){if(au){au.muted=false;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(waBeep)}else waBeep()}
- else if(au){au.pause();au.currentTime=0}}
+function waPlay(k){try{if(!ac)return;if(ac.state!=='running')ac.resume();stopWA();
+ const x=samples(k),b=ac.createBuffer(1,x.length,SR);b.copyToChannel(x,0);
+ const n=ac.createBufferSource();n.buffer=b;n.loop=!!REP[k];n.connect(ac.destination);n.start();wa=n}catch(e){}}
+function stopWA(){try{wa&&wa.stop()}catch(e){}wa=null}
+function stopAll(){clearTimeout(pvT);for(const k in auds){const a=auds[k];a.hold=false;a.pause();a.currentTime=0}stopWA()}
+function play(k){if(!auds[k])audioUnlock();const a=auds[k];
+ if(!a){waPlay(k);return}
+ a.hold=true;a.muted=false;a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>waPlay(k))}
+function align(on){want=on;stopAll();if(on&&snd!=='off')play(snd)}
+function preview(k){stopAll();if(k==='off')return;play(k);pvT=setTimeout(()=>{if(!want)stopAll()},REP[k]?1400:2400)}
 addEventListener('pointerdown',audioUnlock,{passive:true});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want&&au&&au.paused){const p=au.play();if(p&&p.catch)p.catch(waBeep)}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&want&&snd!=='off'&&REP[snd]&&auds[snd]&&auds[snd].paused)play(snd)});
+// speaker menu
+(function(){const bt=$('snd'),mn=$('sndm');
+ mn.innerHTML='<small>Sound when facing Qibla</small>'+[...KINDS,'off'].map(k=>`<button data-k="${k}"><span>${LABEL[k]}</span><span>✓</span></button>`).join('');
+ const mark=()=>{bt.classList.toggle('off',snd==='off');mn.querySelectorAll('button').forEach(b=>{const on=b.dataset.k===snd;b.classList.toggle('on',on);b.lastChild.style.visibility=on?'visible':'hidden'})};
+ const open=o=>{mn.hidden=!o;bt.setAttribute('aria-expanded',o)};
+ bt.onclick=()=>open(mn.hidden);
+ mn.onclick=e=>{const b=e.target.closest('button');if(!b)return;snd=b.dataset.k;try{localStorage.setItem('qibla-snd',snd)}catch(x){}mark();preview(snd);setTimeout(()=>open(false),250)};
+ document.addEventListener('pointerdown',e=>{if(!mn.hidden&&!mn.contains(e.target)&&!bt.contains(e.target))open(false)});
+ mark()})();
 function loop(){if(heading!=null){shown+=(fix(heading-shown+180,360)-180)*.2;$('ring').setAttribute('transform',`rotate(${-shown} 170 170)`);
  const al=pos&&Math.abs(fix(q-shown+180,360)-180)<3;$('cmp').classList.toggle('al',!!al);
  if(al&&!wasAl&&navigator.vibrate)navigator.vibrate(40);if(!!al!==wasAl)align(!!al);wasAl=!!al}
