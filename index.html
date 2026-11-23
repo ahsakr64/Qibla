@@ -325,9 +325,9 @@ function dist(){const p1=pos[0]*R,p2=KAABA[0]*R,dl=(KAABA[1]-pos[1])*R,h=Math.si
  $('qd').textContent=Math.round(q)%360+'° '+['N','NE','E','SE','S','SW','W','NW'][Math.round(q/45)%8]}
 function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textContent='Compass not available — Qibla is '+Math.round(q)+'° from North; use a physical compass';return}
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
-// Heading comes straight from the phone, with no declination correction (same for iPhone and Android).
+// Heading from the phone (iPhone or Android) plus the magnetic declination for your position, so the arrow is relative to true north.
 function onOri(e){let h;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
- heading=fix(h+((screen.orientation&&screen.orientation.angle)||0),360)}
+ heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+dec,360)}
 // ---- facing-Qibla sound: two rising bell notes, played once ----
 // Synthesised here (no files). Played through an <audio> element, which iPhone allows even with the silent switch on;
 // WebAudio is only a backup if the phone refuses the element.
