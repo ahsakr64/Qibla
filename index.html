@@ -46,8 +46,8 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 .acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .btn{margin:6px 0 0;display:inline-block;border:0;border-radius:30px;padding:9px 24px;font:600 17px 'Cormorant Garamond',Georgia,serif;color:#1a1304;background:linear-gradient(#f3dca0,#c9a45c);box-shadow:0 0 22px rgba(217,182,106,.4)}
 .loc{display:flex;align-items:center;justify-content:space-around;margin:6px 0 8px;border:1px solid rgba(217,182,106,.55);border-radius:40px;background:var(--card);padding:6px 8px;text-align:left}
-.loc>div{display:flex;gap:8px;align-items:center;flex:1;justify-content:center}.loc>i{width:1px;height:30px;background:rgba(217,182,106,.4)}
-.loc small,.card small{display:block;font-size:13px;line-height:1.2;color:var(--gold)}.loc b{font-size:18px;font-weight:500;color:var(--ink)}
+.loc>div{display:flex;gap:8px;align-items:center;flex:1 1 0;min-width:0;justify-content:center;text-align:center}.loc .ico{display:none}.loc span{min-width:0;max-width:100%}.loc>i{width:1px;height:30px;background:rgba(217,182,106,.4)}
+.loc small,.card small{display:block;font-size:13px;line-height:1.2;color:var(--gold)}.loc b{display:block;font-size:17px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.loc small{font-size:12px!important}
 .ico{width:26px;height:26px;flex:none}
 .card{border:1px solid rgba(217,182,106,.55);border-radius:22px;background:var(--card);overflow:hidden;text-align:left}
 .top{display:flex;align-items:center;padding:8px 14px}
@@ -117,7 +117,7 @@ h1{font-weight:500;font-size:clamp(38px,6.5dvh,52px);line-height:1;margin:calc(v
 <p id="stat">Tap below to start the compass</p>
 <div class="acts"><button class="btn" id="go">Enable compass &amp; location</button><button class="btn" id="man" style="display:none;background:none;color:#d9b66a;border:1px solid #d9b66a;box-shadow:none">Enter manually</button></div>
 
-<div class="loc"><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg><span><small>Your Location</small><b id="lc">Locating…</b></span></div><i></i><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12l3.5-3.5M3 12l3.5 3.5M21 12l-3.5-3.5M21 12l-3.5 3.5"/></svg><span><small>Distance to Kaaba</small><b id="ds">—</b></span></div></div>
+<div class="loc"><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg><span><small>Your Location</small><b id="lc">Locating…</b></span></div><i></i><div><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12l3.5-3.5M3 12l3.5 3.5M21 12l-3.5-3.5M21 12l-3.5 3.5"/></svg><span><small>Distance to Kaaba</small><b id="ds">—</b></span></div><i></i><div><span><small>Qibla Direction</small><b id="qd">—</b></span></div></div>
 
 <section class="card">
 <div class="top"><div class="np"><small>Next Prayer</small><b id="npn">—</b><span id="npt">Waiting for location</span></div><i class="vl"></i><div class="sr"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#d9b66a" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><small>Sunrise</small><span id="srt">—</span></div></div></div>
@@ -322,13 +322,13 @@ function ok(p){pos=[p.coords.latitude,p.coords.longitude];q=qibla(pos[0],pos[1])
  $('meth').textContent=`Prayer times: ${M.n}, selected automatically for your region`;
  dist();tick();stat()}
 function dist(){const p1=pos[0]*R,p2=KAABA[0]*R,dl=(KAABA[1]-pos[1])*R,h=Math.sin((p2-p1)/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
- $('ds').textContent=Math.round(12742*Math.asin(Math.sqrt(h))).toLocaleString('en-US')+' km'}
+ $('ds').textContent=Math.round(12742*Math.asin(Math.sqrt(h))).toLocaleString('en-US')+' km';
+ $('qd').textContent=Math.round(q)%360+'° '+['N','NE','E','SE','S','SW','W','NW'][Math.round(q/45)%8]}
 function stat(){const s=$('stat');if(!pos){return}if(heading==null){s.textContent='Compass not available — Qibla is '+Math.round(q)+'° from North; use a physical compass';return}
  const d=fix(q-heading+180,360)-180;s.textContent=Math.abs(d)<3?'You are facing the Qibla':'Turn '+(d>0?'right ':'left ')+Math.abs(Math.round(d))+'°. Hold your phone flat';}
-// iPhone's webkitCompassHeading is measured from magnetic north, so we add the declination.
-// Android's reading was ~13 degrees too far east in Montreal with that correction, so it is used as is (see note in chat).
-function onOri(e){let h,fromIphone=false;if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading;fromIphone=true}else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
- heading=fix(h+((screen.orientation&&screen.orientation.angle)||0)+(fromIphone?dec:0),360)}
+// Heading comes straight from the phone, with no declination correction (same calculation for iPhone and Android).
+function onOri(e){let h;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.absolute&&e.alpha!=null)h=360-e.alpha;else return;
+ heading=fix(h+((screen.orientation&&screen.orientation.angle)||0),360)}
 // ---- facing-Qibla sound: two rising bell notes, played once ----
 // Synthesised here (no files). Played through an <audio> element, which iPhone allows even with the silent switch on;
 // WebAudio is only a backup if the phone refuses the element.
